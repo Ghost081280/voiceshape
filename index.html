@@ -1,0 +1,950 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VoiceShape - Your Voice, Your Art</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 50%, #16213e 100%);
+            min-height: 100vh;
+            color: #fff;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        h1 {
+            font-size: 3rem;
+            font-weight: 300;
+            letter-spacing: 8px;
+            margin-bottom: 10px;
+            background: linear-gradient(90deg, #00d4ff, #9d4edd, #ff006e);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .tagline {
+            font-size: 1.1rem;
+            color: #888;
+            font-weight: 300;
+            letter-spacing: 2px;
+        }
+
+        .main-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 24px;
+            padding: 40px;
+            backdrop-filter: blur(10px);
+        }
+
+        .mode-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            justify-content: center;
+        }
+
+        .mode-tab {
+            padding: 12px 30px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            background: transparent;
+            color: #888;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+        }
+
+        .mode-tab:hover {
+            border-color: rgba(255, 255, 255, 0.3);
+            color: #fff;
+        }
+
+        .mode-tab.active {
+            background: linear-gradient(135deg, #9d4edd, #00d4ff);
+            border-color: transparent;
+            color: #fff;
+        }
+
+        .section {
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        /* Record Section */
+        .record-area {
+            text-align: center;
+            padding: 40px 0;
+        }
+
+        .visualizer-container {
+            position: relative;
+            width: 280px;
+            height: 280px;
+            margin: 0 auto 30px;
+        }
+
+        #liveVisualizer {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        .record-btn {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            border: 3px solid #ff006e;
+            background: transparent;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.3s ease;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .record-btn::before {
+            content: '';
+            width: 40px;
+            height: 40px;
+            background: #ff006e;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        .record-btn.recording {
+            border-color: #ff006e;
+            box-shadow: 0 0 30px rgba(255, 0, 110, 0.5);
+            animation: pulse 1.5s infinite;
+        }
+
+        .record-btn.recording::before {
+            width: 30px;
+            height: 30px;
+            border-radius: 6px;
+        }
+
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 30px rgba(255, 0, 110, 0.5); }
+            50% { box-shadow: 0 0 50px rgba(255, 0, 110, 0.8); }
+        }
+
+        .record-status {
+            font-size: 0.9rem;
+            color: #888;
+            margin-bottom: 10px;
+            height: 24px;
+        }
+
+        .timer {
+            font-family: monospace;
+            font-size: 1.5rem;
+            color: #ff006e;
+            margin-bottom: 20px;
+            height: 36px;
+        }
+
+        /* Shape Display */
+        .shape-display {
+            display: none;
+            text-align: center;
+            padding: 30px 0;
+        }
+
+        .shape-display.visible {
+            display: block;
+        }
+
+        #shapeCanvas {
+            max-width: 100%;
+            border-radius: 16px;
+            background: #0a0a0f;
+            margin-bottom: 20px;
+        }
+
+        .shape-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 14px 28px;
+            border: none;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #9d4edd, #00d4ff);
+            color: #fff;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(157, 78, 221, 0.4);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+        }
+
+        .btn-secondary:hover {
+            border-color: rgba(255, 255, 255, 0.4);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        /* Decode Section */
+        .decode-area {
+            text-align: center;
+            padding: 40px 0;
+        }
+
+        .upload-zone {
+            border: 2px dashed rgba(255, 255, 255, 0.2);
+            border-radius: 16px;
+            padding: 60px 40px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 30px;
+        }
+
+        .upload-zone:hover {
+            border-color: rgba(157, 78, 221, 0.5);
+            background: rgba(157, 78, 221, 0.05);
+        }
+
+        .upload-zone.dragover {
+            border-color: #9d4edd;
+            background: rgba(157, 78, 221, 0.1);
+        }
+
+        .upload-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+
+        .upload-text {
+            color: #888;
+            font-size: 1rem;
+        }
+
+        #fileInput {
+            display: none;
+        }
+
+        /* Decoded Message */
+        .decoded-result {
+            display: none;
+            padding: 30px;
+            background: rgba(0, 212, 255, 0.05);
+            border: 1px solid rgba(0, 212, 255, 0.2);
+            border-radius: 16px;
+            margin-top: 20px;
+        }
+
+        .decoded-result.visible {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .decoded-label {
+            font-size: 0.8rem;
+            color: #00d4ff;
+            letter-spacing: 2px;
+            margin-bottom: 15px;
+        }
+
+        .decoded-message {
+            font-size: 1.3rem;
+            line-height: 1.6;
+            color: #fff;
+        }
+
+        .audio-playback {
+            margin-top: 20px;
+        }
+
+        .audio-playback audio {
+            width: 100%;
+            max-width: 400px;
+        }
+
+        /* Info Section */
+        .info-section {
+            margin-top: 50px;
+            text-align: center;
+        }
+
+        .info-title {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            color: #888;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .info-card {
+            padding: 25px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+        }
+
+        .info-card h3 {
+            font-size: 0.9rem;
+            color: #9d4edd;
+            margin-bottom: 8px;
+            letter-spacing: 1px;
+        }
+
+        .info-card p {
+            font-size: 0.85rem;
+            color: #666;
+            line-height: 1.5;
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 2rem;
+                letter-spacing: 4px;
+            }
+
+            .main-card {
+                padding: 25px;
+            }
+
+            .visualizer-container {
+                width: 220px;
+                height: 220px;
+            }
+
+            .shape-actions {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>VOICESHAPE</h1>
+            <p class="tagline">Your voice becomes art. Your art becomes message.</p>
+        </header>
+
+        <div class="main-card">
+            <div class="mode-tabs">
+                <button class="mode-tab active" data-mode="record">CREATE</button>
+                <button class="mode-tab" data-mode="decode">DECODE</button>
+            </div>
+
+            <!-- Record Section -->
+            <div id="recordSection" class="section active">
+                <div class="record-area">
+                    <div class="visualizer-container">
+                        <canvas id="liveVisualizer"></canvas>
+                    </div>
+                    
+                    <p class="record-status" id="recordStatus">Tap to record your message</p>
+                    <p class="timer" id="timer"></p>
+                    
+                    <button class="record-btn" id="recordBtn"></button>
+                </div>
+
+                <div class="shape-display" id="shapeDisplay">
+                    <canvas id="shapeCanvas" width="500" height="500"></canvas>
+                    
+                    <div class="shape-actions">
+                        <button class="btn btn-primary" id="downloadBtn">Download Shape</button>
+                        <button class="btn btn-secondary" id="shareBtn">Copy Share Link</button>
+                        <button class="btn btn-secondary" id="newRecordBtn">Record New</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Decode Section -->
+            <div id="decodeSection" class="section">
+                <div class="decode-area">
+                    <div class="upload-zone" id="uploadZone">
+                        <div class="upload-icon">◈</div>
+                        <p class="upload-text">Drop a VoiceShape here or click to upload</p>
+                    </div>
+                    <input type="file" id="fileInput" accept="image/png">
+
+                    <div class="decoded-result" id="decodedResult">
+                        <p class="decoded-label">DECODED MESSAGE</p>
+                        <p class="decoded-message" id="decodedMessage"></p>
+                        <div class="audio-playback" id="audioPlayback"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="info-section">
+            <p class="info-title">How it works</p>
+            <div class="info-grid">
+                <div class="info-card">
+                    <h3>RECORD</h3>
+                    <p>Speak your message. Your unique voice frequencies are captured and analyzed.</p>
+                </div>
+                <div class="info-card">
+                    <h3>TRANSFORM</h3>
+                    <p>Frequencies become art. Pitch, tone, rhythm - all encoded into a unique shape.</p>
+                </div>
+                <div class="info-card">
+                    <h3>SHARE</h3>
+                    <p>Send your shape. Only VoiceShape can decode it back to your original message.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Audio context and recording
+        let audioContext;
+        let analyser;
+        let microphone;
+        let mediaRecorder;
+        let audioChunks = [];
+        let isRecording = false;
+        let recordingStartTime;
+        let timerInterval;
+        let frequencyData = [];
+        let animationId;
+
+        // DOM Elements
+        const recordBtn = document.getElementById('recordBtn');
+        const recordStatus = document.getElementById('recordStatus');
+        const timer = document.getElementById('timer');
+        const liveVisualizer = document.getElementById('liveVisualizer');
+        const shapeCanvas = document.getElementById('shapeCanvas');
+        const shapeDisplay = document.getElementById('shapeDisplay');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const shareBtn = document.getElementById('shareBtn');
+        const newRecordBtn = document.getElementById('newRecordBtn');
+        const uploadZone = document.getElementById('uploadZone');
+        const fileInput = document.getElementById('fileInput');
+        const decodedResult = document.getElementById('decodedResult');
+        const decodedMessage = document.getElementById('decodedMessage');
+        const audioPlayback = document.getElementById('audioPlayback');
+
+        // Mode tabs
+        document.querySelectorAll('.mode-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.mode-tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+                tab.classList.add('active');
+                document.getElementById(tab.dataset.mode + 'Section').classList.add('active');
+            });
+        });
+
+        // Initialize audio
+        async function initAudio() {
+            try {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                
+                microphone = audioContext.createMediaStreamSource(stream);
+                analyser = audioContext.createAnalyser();
+                analyser.fftSize = 256;
+                analyser.smoothingTimeConstant = 0.8;
+                microphone.connect(analyser);
+
+                mediaRecorder = new MediaRecorder(stream);
+                
+                mediaRecorder.ondataavailable = (e) => {
+                    audioChunks.push(e.data);
+                };
+
+                mediaRecorder.onstop = () => {
+                    processRecording();
+                };
+
+                return true;
+            } catch (err) {
+                console.error('Microphone access denied:', err);
+                recordStatus.textContent = 'Microphone access required';
+                return false;
+            }
+        }
+
+        // Live visualizer
+        function drawLiveVisualizer() {
+            const ctx = liveVisualizer.getContext('2d');
+            const width = liveVisualizer.width = liveVisualizer.offsetWidth * 2;
+            const height = liveVisualizer.height = liveVisualizer.offsetHeight * 2;
+            const centerX = width / 2;
+            const centerY = height / 2;
+            const radius = Math.min(width, height) * 0.35;
+
+            function draw() {
+                if (!isRecording) {
+                    ctx.clearRect(0, 0, width, height);
+                    return;
+                }
+
+                const bufferLength = analyser.frequencyBinCount;
+                const dataArray = new Uint8Array(bufferLength);
+                analyser.getByteFrequencyData(dataArray);
+
+                // Store frequency data for shape generation
+                frequencyData.push([...dataArray]);
+
+                ctx.fillStyle = 'rgba(10, 10, 15, 0.2)';
+                ctx.fillRect(0, 0, width, height);
+
+                // Draw circular frequency visualization
+                const sliceAngle = (Math.PI * 2) / bufferLength;
+                
+                ctx.beginPath();
+                for (let i = 0; i < bufferLength; i++) {
+                    const amplitude = dataArray[i] / 255;
+                    const r = radius + amplitude * radius * 0.5;
+                    const angle = i * sliceAngle - Math.PI / 2;
+                    const x = centerX + Math.cos(angle) * r;
+                    const y = centerY + Math.sin(angle) * r;
+                    
+                    if (i === 0) {
+                        ctx.moveTo(x, y);
+                    } else {
+                        ctx.lineTo(x, y);
+                    }
+                }
+                ctx.closePath();
+
+                const gradient = ctx.createRadialGradient(centerX, centerY, radius * 0.5, centerX, centerY, radius * 1.5);
+                gradient.addColorStop(0, 'rgba(157, 78, 221, 0.8)');
+                gradient.addColorStop(0.5, 'rgba(0, 212, 255, 0.6)');
+                gradient.addColorStop(1, 'rgba(255, 0, 110, 0.4)');
+                
+                ctx.strokeStyle = gradient;
+                ctx.lineWidth = 3;
+                ctx.stroke();
+
+                animationId = requestAnimationFrame(draw);
+            }
+
+            draw();
+        }
+
+        // Recording controls
+        recordBtn.addEventListener('click', async () => {
+            if (!audioContext) {
+                const initialized = await initAudio();
+                if (!initialized) return;
+            }
+
+            if (!isRecording) {
+                startRecording();
+            } else {
+                stopRecording();
+            }
+        });
+
+        function startRecording() {
+            isRecording = true;
+            audioChunks = [];
+            frequencyData = [];
+            recordBtn.classList.add('recording');
+            recordStatus.textContent = 'Recording...';
+            recordingStartTime = Date.now();
+            
+            mediaRecorder.start();
+            drawLiveVisualizer();
+            
+            timerInterval = setInterval(() => {
+                const elapsed = Math.floor((Date.now() - recordingStartTime) / 1000);
+                const mins = Math.floor(elapsed / 60).toString().padStart(2, '0');
+                const secs = (elapsed % 60).toString().padStart(2, '0');
+                timer.textContent = `${mins}:${secs}`;
+            }, 100);
+
+            // Auto-stop after 30 seconds
+            setTimeout(() => {
+                if (isRecording) stopRecording();
+            }, 30000);
+        }
+
+        function stopRecording() {
+            isRecording = false;
+            recordBtn.classList.remove('recording');
+            recordStatus.textContent = 'Processing...';
+            clearInterval(timerInterval);
+            cancelAnimationFrame(animationId);
+            mediaRecorder.stop();
+        }
+
+        function processRecording() {
+            const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+            generateShape(audioBlob);
+        }
+
+        // Shape Generation
+        function generateShape(audioBlob) {
+            const ctx = shapeCanvas.getContext('2d');
+            const width = shapeCanvas.width;
+            const height = shapeCanvas.height;
+            const centerX = width / 2;
+            const centerY = height / 2;
+
+            // Clear canvas
+            ctx.fillStyle = '#0a0a0f';
+            ctx.fillRect(0, 0, width, height);
+
+            if (frequencyData.length === 0) {
+                recordStatus.textContent = 'No audio captured. Try again.';
+                return;
+            }
+
+            // Analyze frequency data to extract features
+            const features = extractFeatures(frequencyData);
+            
+            // Generate unique shape based on features
+            drawVoiceShape(ctx, centerX, centerY, features);
+
+            // Encode audio data into image
+            encodeAudioIntoImage(ctx, audioBlob, features);
+
+            // Show shape
+            shapeDisplay.classList.add('visible');
+            recordStatus.textContent = 'Your VoiceShape is ready!';
+            timer.textContent = '';
+        }
+
+        function extractFeatures(data) {
+            // Average frequencies across recording
+            const avgFreqs = new Array(data[0].length).fill(0);
+            data.forEach(frame => {
+                frame.forEach((val, i) => {
+                    avgFreqs[i] += val;
+                });
+            });
+            avgFreqs.forEach((val, i) => avgFreqs[i] = val / data.length);
+
+            // Extract key features
+            const bassEnergy = avgFreqs.slice(0, 10).reduce((a, b) => a + b, 0) / 10;
+            const midEnergy = avgFreqs.slice(10, 50).reduce((a, b) => a + b, 0) / 40;
+            const highEnergy = avgFreqs.slice(50).reduce((a, b) => a + b, 0) / (avgFreqs.length - 50);
+            
+            // Rhythm detection (variance over time)
+            const energyOverTime = data.map(frame => frame.reduce((a, b) => a + b, 0));
+            const avgEnergy = energyOverTime.reduce((a, b) => a + b, 0) / energyOverTime.length;
+            const variance = energyOverTime.reduce((sum, e) => sum + Math.pow(e - avgEnergy, 2), 0) / energyOverTime.length;
+            
+            return {
+                bass: bassEnergy / 255,
+                mid: midEnergy / 255,
+                high: highEnergy / 255,
+                rhythm: Math.sqrt(variance) / 1000,
+                duration: data.length,
+                rawFreqs: avgFreqs
+            };
+        }
+
+        function drawVoiceShape(ctx, cx, cy, features) {
+            const { bass, mid, high, rhythm, rawFreqs } = features;
+            
+            // Number of layers based on voice complexity
+            const layers = 3 + Math.floor(rhythm * 5);
+            
+            // Base colors derived from frequency distribution
+            const hue1 = (bass * 360) % 360;
+            const hue2 = (mid * 360 + 120) % 360;
+            const hue3 = (high * 360 + 240) % 360;
+
+            // Draw multiple organic layers
+            for (let layer = 0; layer < layers; layer++) {
+                const layerProgress = layer / layers;
+                const baseRadius = 80 + layerProgress * 100;
+                const points = 64 + Math.floor(layer * 16);
+                
+                ctx.beginPath();
+                
+                for (let i = 0; i <= points; i++) {
+                    const angle = (i / points) * Math.PI * 2;
+                    const freqIndex = Math.floor((i / points) * rawFreqs.length);
+                    const freqValue = rawFreqs[freqIndex] / 255;
+                    
+                    // Create organic variation
+                    const noiseOffset = Math.sin(angle * (3 + layer)) * (20 + rhythm * 30);
+                    const freqOffset = freqValue * 40 * (1 - layerProgress * 0.5);
+                    const radius = baseRadius + noiseOffset + freqOffset;
+                    
+                    const x = cx + Math.cos(angle) * radius;
+                    const y = cy + Math.sin(angle) * radius;
+                    
+                    if (i === 0) {
+                        ctx.moveTo(x, y);
+                    } else {
+                        // Smooth curves
+                        const prevAngle = ((i - 1) / points) * Math.PI * 2;
+                        const prevFreqIndex = Math.floor(((i - 1) / points) * rawFreqs.length);
+                        const prevFreqValue = rawFreqs[prevFreqIndex] / 255;
+                        const prevNoiseOffset = Math.sin(prevAngle * (3 + layer)) * (20 + rhythm * 30);
+                        const prevFreqOffset = prevFreqValue * 40 * (1 - layerProgress * 0.5);
+                        const prevRadius = baseRadius + prevNoiseOffset + prevFreqOffset;
+                        
+                        const cpRadius = (radius + prevRadius) / 2;
+                        const cpAngle = (angle + prevAngle) / 2;
+                        const cpX = cx + Math.cos(cpAngle) * cpRadius * 1.02;
+                        const cpY = cy + Math.sin(cpAngle) * cpRadius * 1.02;
+                        
+                        ctx.quadraticCurveTo(cpX, cpY, x, y);
+                    }
+                }
+                
+                ctx.closePath();
+                
+                // Layer-specific styling
+                const hue = layer % 3 === 0 ? hue1 : (layer % 3 === 1 ? hue2 : hue3);
+                const alpha = 0.15 + (1 - layerProgress) * 0.25;
+                
+                ctx.fillStyle = `hsla(${hue}, 70%, 50%, ${alpha * 0.3})`;
+                ctx.fill();
+                
+                ctx.strokeStyle = `hsla(${hue}, 80%, 60%, ${alpha})`;
+                ctx.lineWidth = 2 - layerProgress;
+                ctx.stroke();
+            }
+
+            // Central glow
+            const gradient = ctx.createRadialGradient(cx, cy, 0, cx, cy, 80);
+            gradient.addColorStop(0, `hsla(${hue1}, 100%, 70%, 0.3)`);
+            gradient.addColorStop(0.5, `hsla(${hue2}, 80%, 50%, 0.1)`);
+            gradient.addColorStop(1, 'transparent');
+            
+            ctx.fillStyle = gradient;
+            ctx.beginPath();
+            ctx.arc(cx, cy, 80, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        // Encode audio into image metadata (steganography-lite)
+        let currentEncodedData = null;
+
+        async function encodeAudioIntoImage(ctx, audioBlob, features) {
+            // Convert audio to base64
+            const reader = new FileReader();
+            reader.onload = () => {
+                const audioBase64 = reader.result.split(',')[1];
+                
+                // Store encoded data for download
+                currentEncodedData = {
+                    audio: audioBase64,
+                    features: features,
+                    timestamp: Date.now()
+                };
+            };
+            reader.readAsDataURL(audioBlob);
+        }
+
+        // Download with encoded data
+        downloadBtn.addEventListener('click', () => {
+            if (!currentEncodedData) return;
+
+            // Create a new canvas with the shape
+            const exportCanvas = document.createElement('canvas');
+            exportCanvas.width = shapeCanvas.width;
+            exportCanvas.height = shapeCanvas.height;
+            const exportCtx = exportCanvas.getContext('2d');
+            
+            // Copy shape
+            exportCtx.drawImage(shapeCanvas, 0, 0);
+            
+            // Encode data in image using LSB steganography
+            const imageData = exportCtx.getImageData(0, 0, exportCanvas.width, exportCanvas.height);
+            const encodedJson = JSON.stringify(currentEncodedData);
+            const encodedBytes = new TextEncoder().encode(encodedJson);
+            
+            // Store length first (4 bytes)
+            const length = encodedBytes.length;
+            for (let i = 0; i < 32; i++) {
+                const bit = (length >> (31 - i)) & 1;
+                imageData.data[i * 4] = (imageData.data[i * 4] & 0xFE) | bit;
+            }
+            
+            // Store data
+            for (let i = 0; i < encodedBytes.length; i++) {
+                for (let b = 0; b < 8; b++) {
+                    const pixelIndex = (32 + i * 8 + b) * 4;
+                    if (pixelIndex < imageData.data.length) {
+                        const bit = (encodedBytes[i] >> (7 - b)) & 1;
+                        imageData.data[pixelIndex] = (imageData.data[pixelIndex] & 0xFE) | bit;
+                    }
+                }
+            }
+            
+            exportCtx.putImageData(imageData, 0, 0);
+            
+            // Download
+            const link = document.createElement('a');
+            link.download = `voiceshape-${Date.now()}.png`;
+            link.href = exportCanvas.toDataURL('image/png');
+            link.click();
+        });
+
+        // Share functionality
+        shareBtn.addEventListener('click', () => {
+            // In production, this would upload to server and generate unique URL
+            const mockUrl = `https://voiceshape.io/decode/${Date.now().toString(36)}`;
+            navigator.clipboard.writeText(mockUrl).then(() => {
+                shareBtn.textContent = 'Link Copied!';
+                setTimeout(() => {
+                    shareBtn.textContent = 'Copy Share Link';
+                }, 2000);
+            });
+        });
+
+        // New recording
+        newRecordBtn.addEventListener('click', () => {
+            shapeDisplay.classList.remove('visible');
+            recordStatus.textContent = 'Tap to record your message';
+            timer.textContent = '';
+            currentEncodedData = null;
+        });
+
+        // Decode functionality
+        uploadZone.addEventListener('click', () => fileInput.click());
+        
+        uploadZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadZone.classList.add('dragover');
+        });
+
+        uploadZone.addEventListener('dragleave', () => {
+            uploadZone.classList.remove('dragover');
+        });
+
+        uploadZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadZone.classList.remove('dragover');
+            const file = e.dataTransfer.files[0];
+            if (file) decodeImage(file);
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) decodeImage(file);
+        });
+
+        function decodeImage(file) {
+            const img = new Image();
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                canvas.width = img.width;
+                canvas.height = img.height;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0);
+                
+                const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                
+                // Extract length
+                let length = 0;
+                for (let i = 0; i < 32; i++) {
+                    const bit = imageData.data[i * 4] & 1;
+                    length = (length << 1) | bit;
+                }
+                
+                // Sanity check
+                if (length <= 0 || length > 1000000) {
+                    decodedMessage.textContent = 'Unable to decode this image. It may not be a valid VoiceShape.';
+                    decodedResult.classList.add('visible');
+                    return;
+                }
+                
+                // Extract data
+                const bytes = new Uint8Array(length);
+                for (let i = 0; i < length; i++) {
+                    let byte = 0;
+                    for (let b = 0; b < 8; b++) {
+                        const pixelIndex = (32 + i * 8 + b) * 4;
+                        if (pixelIndex < imageData.data.length) {
+                            const bit = imageData.data[pixelIndex] & 1;
+                            byte = (byte << 1) | bit;
+                        }
+                    }
+                    bytes[i] = byte;
+                }
+                
+                try {
+                    const jsonStr = new TextDecoder().decode(bytes);
+                    const data = JSON.parse(jsonStr);
+                    
+                    // Display result
+                    const date = new Date(data.timestamp);
+                    decodedMessage.innerHTML = `
+                        <strong>Voice message from ${date.toLocaleDateString()}</strong><br><br>
+                        Bass energy: ${Math.round(data.features.bass * 100)}%<br>
+                        Mid range: ${Math.round(data.features.mid * 100)}%<br>
+                        High frequencies: ${Math.round(data.features.high * 100)}%<br>
+                        Voice rhythm: ${Math.round(data.features.rhythm * 100)}%
+                    `;
+                    
+                    // Recreate audio
+                    if (data.audio) {
+                        const audioSrc = `data:audio/webm;base64,${data.audio}`;
+                        audioPlayback.innerHTML = `
+                            <audio controls src="${audioSrc}"></audio>
+                        `;
+                    }
+                    
+                    decodedResult.classList.add('visible');
+                    
+                } catch (err) {
+                    decodedMessage.textContent = 'Unable to decode this image. It may not be a valid VoiceShape.';
+                    decodedResult.classList.add('visible');
+                }
+            };
+            
+            img.src = URL.createObjectURL(file);
+        }
+    </script>
+</body>
+</html>
