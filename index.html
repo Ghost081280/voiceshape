@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>VoiceShape - Your Voice, Your Art</title>
+    <meta property="og:title" content="VoiceShape - Someone sent you a voice message">
+    <meta property="og:description" content="Decode this unique voice shape to hear the message">
     <style>
         * {
             margin: 0;
@@ -94,7 +96,6 @@
             display: block;
         }
 
-        /* Record Section */
         .record-area {
             text-align: center;
             padding: 40px 0;
@@ -159,7 +160,7 @@
             font-size: 0.9rem;
             color: #888;
             margin-bottom: 10px;
-            height: 24px;
+            min-height: 24px;
         }
 
         .timer {
@@ -170,7 +171,6 @@
             height: 36px;
         }
 
-        /* Shape Display */
         .shape-display {
             display: none;
             text-align: center;
@@ -226,89 +226,135 @@
             background: rgba(255, 255, 255, 0.05);
         }
 
-        /* Decode Section */
         .decode-area {
             text-align: center;
             padding: 40px 0;
         }
 
-        .upload-zone {
-            border: 2px dashed rgba(255, 255, 255, 0.2);
-            border-radius: 16px;
-            padding: 60px 40px;
-            cursor: pointer;
-            transition: all 0.3s ease;
+        .decode-message {
+            padding: 40px;
+        }
+
+        .decode-message h2 {
+            font-size: 1.5rem;
+            font-weight: 300;
             margin-bottom: 30px;
-        }
-
-        .upload-zone:hover {
-            border-color: rgba(157, 78, 221, 0.5);
-            background: rgba(157, 78, 221, 0.05);
-        }
-
-        .upload-zone.dragover {
-            border-color: #9d4edd;
-            background: rgba(157, 78, 221, 0.1);
-        }
-
-        .upload-icon {
-            font-size: 3rem;
-            margin-bottom: 15px;
-            opacity: 0.5;
-        }
-
-        .upload-text {
-            color: #888;
-            font-size: 1rem;
-        }
-
-        #fileInput {
-            display: none;
-        }
-
-        /* Decoded Message */
-        .decoded-result {
-            display: none;
-            padding: 30px;
-            background: rgba(0, 212, 255, 0.05);
-            border: 1px solid rgba(0, 212, 255, 0.2);
-            border-radius: 16px;
-            margin-top: 20px;
-        }
-
-        .decoded-result.visible {
-            display: block;
-            animation: fadeIn 0.5s ease;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .decoded-label {
-            font-size: 0.8rem;
             color: #00d4ff;
-            letter-spacing: 2px;
-            margin-bottom: 15px;
         }
 
-        .decoded-message {
-            font-size: 1.3rem;
-            line-height: 1.6;
-            color: #fff;
+        #decodeShapeCanvas {
+            max-width: 100%;
+            width: 400px;
+            height: 400px;
+            border-radius: 16px;
+            background: #0a0a0f;
+            margin: 0 auto 30px;
         }
 
-        .audio-playback {
+        .play-btn {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            border: 2px solid #00d4ff;
+            background: rgba(0, 212, 255, 0.1);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            transition: all 0.3s ease;
+        }
+
+        .play-btn:hover {
+            background: rgba(0, 212, 255, 0.2);
+            transform: scale(1.05);
+        }
+
+        .play-btn svg {
+            width: 30px;
+            height: 30px;
+            fill: #00d4ff;
+            margin-left: 4px;
+        }
+
+        .voice-info {
+            color: #666;
+            font-size: 0.85rem;
             margin-top: 20px;
         }
 
-        .audio-playback audio {
-            width: 100%;
-            max-width: 400px;
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
         }
 
-        /* Info Section */
+        .modal-overlay.visible {
+            display: flex;
+        }
+
+        .modal {
+            background: #1a1a2e;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 500px;
+            width: 100%;
+        }
+
+        .modal h3 {
+            margin-bottom: 20px;
+            font-weight: 400;
+        }
+
+        .share-url {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 15px;
+            word-break: break-all;
+            font-size: 0.7rem;
+            color: #888;
+            margin-bottom: 20px;
+            max-height: 120px;
+            overflow-y: auto;
+        }
+
+        .share-note {
+            font-size: 0.8rem;
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .modal-actions .btn {
+            flex: 1;
+        }
+
+        .cta-section {
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+        }
+
+        .cta-section p {
+            color: #666;
+            margin-bottom: 15px;
+        }
+
         .info-section {
             margin-top: 50px;
             text-align: center;
@@ -346,7 +392,25 @@
             line-height: 1.5;
         }
 
-        /* Responsive */
+        .loading {
+            text-align: center;
+            padding: 60px;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-top-color: #9d4edd;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
         @media (max-width: 600px) {
             h1 {
                 font-size: 2rem;
@@ -369,6 +433,11 @@
             .btn {
                 width: 100%;
             }
+
+            #decodeShapeCanvas {
+                width: 280px;
+                height: 280px;
+            }
         }
     </style>
 </head>
@@ -380,14 +449,13 @@
         </header>
 
         <div class="main-card">
-            <div class="mode-tabs">
+            <div class="mode-tabs" id="modeTabs">
                 <button class="mode-tab active" data-mode="record">CREATE</button>
                 <button class="mode-tab" data-mode="decode">DECODE</button>
             </div>
 
-            <!-- Record Section -->
             <div id="recordSection" class="section active">
-                <div class="record-area">
+                <div class="record-area" id="recordArea">
                     <div class="visualizer-container">
                         <canvas id="liveVisualizer"></canvas>
                     </div>
@@ -396,38 +464,50 @@
                     <p class="timer" id="timer"></p>
                     
                     <button class="record-btn" id="recordBtn"></button>
+                    
+                    <p style="color: #444; font-size: 0.8rem; margin-top: 20px;">Max 5 seconds for shareable links</p>
                 </div>
 
                 <div class="shape-display" id="shapeDisplay">
                     <canvas id="shapeCanvas" width="500" height="500"></canvas>
                     
                     <div class="shape-actions">
-                        <button class="btn btn-primary" id="downloadBtn">Download Shape</button>
-                        <button class="btn btn-secondary" id="shareBtn">Copy Share Link</button>
+                        <button class="btn btn-primary" id="shareBtn">Copy Share Link</button>
+                        <button class="btn btn-secondary" id="downloadBtn">Download Image</button>
                         <button class="btn btn-secondary" id="newRecordBtn">Record New</button>
                     </div>
                 </div>
             </div>
 
-            <!-- Decode Section -->
             <div id="decodeSection" class="section">
                 <div class="decode-area">
-                    <div class="upload-zone" id="uploadZone">
-                        <div class="upload-icon">◈</div>
-                        <p class="upload-text">Drop a VoiceShape here or click to upload</p>
+                    <div class="loading" id="decodeLoading">
+                        <div class="loading-spinner"></div>
+                        <p>Decoding voice shape...</p>
                     </div>
-                    <input type="file" id="fileInput" accept="image/png">
-
-                    <div class="decoded-result" id="decodedResult">
-                        <p class="decoded-label">DECODED MESSAGE</p>
-                        <p class="decoded-message" id="decodedMessage"></p>
-                        <div class="audio-playback" id="audioPlayback"></div>
+                    
+                    <div class="decode-message" id="decodeMessage" style="display: none;">
+                        <h2>Someone sent you a voice message</h2>
+                        <canvas id="decodeShapeCanvas" width="400" height="400"></canvas>
+                        
+                        <button class="play-btn" id="playBtn">
+                            <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                        </button>
+                        
+                        <p style="color: #888; font-size: 0.9rem;">Tap to play</p>
+                        
+                        <div class="voice-info" id="voiceInfo"></div>
+                        
+                        <div class="cta-section">
+                            <p>Want to send your own voice shape?</p>
+                            <button class="btn btn-primary" id="createOwnBtn">Create Your Own</button>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div class="info-section">
+        <div class="info-section" id="infoSection">
             <p class="info-title">How it works</p>
             <div class="info-grid">
                 <div class="info-card">
@@ -446,8 +526,22 @@
         </div>
     </div>
 
+    <div class="modal-overlay" id="shareModal">
+        <div class="modal">
+            <h3>Share Your VoiceShape</h3>
+            <div class="share-url" id="shareUrl"></div>
+            <p class="share-note">Send this link to someone - they'll see your shape and hear your voice!</p>
+            <div class="modal-actions">
+                <button class="btn btn-primary" id="copyLinkBtn">Copy Link</button>
+                <button class="btn btn-secondary" id="closeModalBtn">Close</button>
+            </div>
+        </div>
+    </div>
+
     <script>
-        // Audio context and recording
+        const BASE_URL = 'https://ghost081280.github.io/voiceshape/';
+        const MAX_RECORD_SECONDS = 5;
+
         let audioContext;
         let analyser;
         let microphone;
@@ -458,22 +552,34 @@
         let timerInterval;
         let frequencyData = [];
         let animationId;
+        let currentRecordingData = null;
 
-        // DOM Elements
         const recordBtn = document.getElementById('recordBtn');
         const recordStatus = document.getElementById('recordStatus');
         const timer = document.getElementById('timer');
         const liveVisualizer = document.getElementById('liveVisualizer');
         const shapeCanvas = document.getElementById('shapeCanvas');
         const shapeDisplay = document.getElementById('shapeDisplay');
+        const recordArea = document.getElementById('recordArea');
         const downloadBtn = document.getElementById('downloadBtn');
         const shareBtn = document.getElementById('shareBtn');
         const newRecordBtn = document.getElementById('newRecordBtn');
-        const uploadZone = document.getElementById('uploadZone');
-        const fileInput = document.getElementById('fileInput');
-        const decodedResult = document.getElementById('decodedResult');
-        const decodedMessage = document.getElementById('decodedMessage');
-        const audioPlayback = document.getElementById('audioPlayback');
+        const shareModal = document.getElementById('shareModal');
+        const shareUrl = document.getElementById('shareUrl');
+        const copyLinkBtn = document.getElementById('copyLinkBtn');
+        const closeModalBtn = document.getElementById('closeModalBtn');
+        const modeTabs = document.getElementById('modeTabs');
+        const infoSection = document.getElementById('infoSection');
+
+        // Check for incoming shared message on load
+        window.addEventListener('DOMContentLoaded', () => {
+            const params = new URLSearchParams(window.location.search);
+            const data = params.get('d');
+            
+            if (data) {
+                showDecodeView(data);
+            }
+        });
 
         // Mode tabs
         document.querySelectorAll('.mode-tab').forEach(tab => {
@@ -485,7 +591,6 @@
             });
         });
 
-        // Initialize audio
         async function initAudio() {
             try {
                 audioContext = new (window.AudioContext || window.webkitAudioContext)();
@@ -497,7 +602,8 @@
                 analyser.smoothingTimeConstant = 0.8;
                 microphone.connect(analyser);
 
-                mediaRecorder = new MediaRecorder(stream);
+                const options = { mimeType: 'audio/webm;codecs=opus', audioBitsPerSecond: 16000 };
+                mediaRecorder = new MediaRecorder(stream, MediaRecorder.isTypeSupported(options.mimeType) ? options : {});
                 
                 mediaRecorder.ondataavailable = (e) => {
                     audioChunks.push(e.data);
@@ -515,7 +621,6 @@
             }
         }
 
-        // Live visualizer
         function drawLiveVisualizer() {
             const ctx = liveVisualizer.getContext('2d');
             const width = liveVisualizer.width = liveVisualizer.offsetWidth * 2;
@@ -534,13 +639,11 @@
                 const dataArray = new Uint8Array(bufferLength);
                 analyser.getByteFrequencyData(dataArray);
 
-                // Store frequency data for shape generation
                 frequencyData.push([...dataArray]);
 
                 ctx.fillStyle = 'rgba(10, 10, 15, 0.2)';
                 ctx.fillRect(0, 0, width, height);
 
-                // Draw circular frequency visualization
                 const sliceAngle = (Math.PI * 2) / bufferLength;
                 
                 ctx.beginPath();
@@ -574,7 +677,6 @@
             draw();
         }
 
-        // Recording controls
         recordBtn.addEventListener('click', async () => {
             if (!audioContext) {
                 const initialized = await initAudio();
@@ -601,15 +703,13 @@
             
             timerInterval = setInterval(() => {
                 const elapsed = Math.floor((Date.now() - recordingStartTime) / 1000);
-                const mins = Math.floor(elapsed / 60).toString().padStart(2, '0');
-                const secs = (elapsed % 60).toString().padStart(2, '0');
-                timer.textContent = `${mins}:${secs}`;
+                const remaining = MAX_RECORD_SECONDS - elapsed;
+                timer.textContent = `0:${remaining.toString().padStart(2, '0')}`;
+                
+                if (remaining <= 0) {
+                    stopRecording();
+                }
             }, 100);
-
-            // Auto-stop after 30 seconds
-            setTimeout(() => {
-                if (isRecording) stopRecording();
-            }, 30000);
         }
 
         function stopRecording() {
@@ -621,120 +721,120 @@
             mediaRecorder.stop();
         }
 
-        function processRecording() {
+        async function processRecording() {
             const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
-            generateShape(audioBlob);
-        }
-
-        // Shape Generation
-        function generateShape(audioBlob) {
-            const ctx = shapeCanvas.getContext('2d');
-            const width = shapeCanvas.width;
-            const height = shapeCanvas.height;
-            const centerX = width / 2;
-            const centerY = height / 2;
-
-            // Clear canvas
-            ctx.fillStyle = '#0a0a0f';
-            ctx.fillRect(0, 0, width, height);
-
-            if (frequencyData.length === 0) {
-                recordStatus.textContent = 'No audio captured. Try again.';
-                return;
-            }
-
-            // Analyze frequency data to extract features
-            const features = extractFeatures(frequencyData);
             
-            // Generate unique shape based on features
-            drawVoiceShape(ctx, centerX, centerY, features);
-
-            // Encode audio data into image
-            encodeAudioIntoImage(ctx, audioBlob, features);
-
-            // Show shape
-            shapeDisplay.classList.add('visible');
-            recordStatus.textContent = 'Your VoiceShape is ready!';
-            timer.textContent = '';
+            const reader = new FileReader();
+            reader.onload = () => {
+                const base64Audio = reader.result.split(',')[1];
+                const features = extractFeatures(frequencyData);
+                
+                currentRecordingData = {
+                    a: base64Audio,
+                    f: features,
+                    t: Date.now()
+                };
+                
+                generateShape(features);
+                
+                recordArea.style.display = 'none';
+                shapeDisplay.classList.add('visible');
+                recordStatus.textContent = 'Your VoiceShape is ready!';
+                timer.textContent = '';
+            };
+            reader.readAsDataURL(audioBlob);
         }
 
         function extractFeatures(data) {
-            // Average frequencies across recording
+            if (!data || data.length === 0) return { b: 0.5, m: 0.5, h: 0.5, r: 0.5, q: new Array(32).fill(128) };
+            
             const avgFreqs = new Array(data[0].length).fill(0);
             data.forEach(frame => {
                 frame.forEach((val, i) => {
                     avgFreqs[i] += val;
                 });
             });
-            avgFreqs.forEach((val, i) => avgFreqs[i] = val / data.length);
+            avgFreqs.forEach((val, i) => avgFreqs[i] = Math.round(val / data.length));
 
-            // Extract key features
             const bassEnergy = avgFreqs.slice(0, 10).reduce((a, b) => a + b, 0) / 10;
             const midEnergy = avgFreqs.slice(10, 50).reduce((a, b) => a + b, 0) / 40;
             const highEnergy = avgFreqs.slice(50).reduce((a, b) => a + b, 0) / (avgFreqs.length - 50);
             
-            // Rhythm detection (variance over time)
             const energyOverTime = data.map(frame => frame.reduce((a, b) => a + b, 0));
             const avgEnergy = energyOverTime.reduce((a, b) => a + b, 0) / energyOverTime.length;
             const variance = energyOverTime.reduce((sum, e) => sum + Math.pow(e - avgEnergy, 2), 0) / energyOverTime.length;
             
+            const compressedFreqs = avgFreqs.filter((_, i) => i % 4 === 0);
+            
             return {
-                bass: bassEnergy / 255,
-                mid: midEnergy / 255,
-                high: highEnergy / 255,
-                rhythm: Math.sqrt(variance) / 1000,
-                duration: data.length,
-                rawFreqs: avgFreqs
+                b: Math.round(bassEnergy / 255 * 100) / 100,
+                m: Math.round(midEnergy / 255 * 100) / 100,
+                h: Math.round(highEnergy / 255 * 100) / 100,
+                r: Math.round(Math.sqrt(variance) / 1000 * 100) / 100,
+                q: compressedFreqs
             };
         }
 
-        function drawVoiceShape(ctx, cx, cy, features) {
-            const { bass, mid, high, rhythm, rawFreqs } = features;
-            
-            // Number of layers based on voice complexity
+        function generateShape(features, targetCanvas = shapeCanvas) {
+            const ctx = targetCanvas.getContext('2d');
+            const width = targetCanvas.width;
+            const height = targetCanvas.height;
+            const centerX = width / 2;
+            const centerY = height / 2;
+
+            ctx.fillStyle = '#0a0a0f';
+            ctx.fillRect(0, 0, width, height);
+
+            const rawFreqs = features.q || new Array(32).fill(128);
+            const expandedFreqs = [];
+            rawFreqs.forEach(v => {
+                expandedFreqs.push(v, v, v, v);
+            });
+
+            const bass = features.b || 0.5;
+            const mid = features.m || 0.5;
+            const high = features.h || 0.5;
+            const rhythm = features.r || 0.5;
+
             const layers = 3 + Math.floor(rhythm * 5);
             
-            // Base colors derived from frequency distribution
             const hue1 = (bass * 360) % 360;
             const hue2 = (mid * 360 + 120) % 360;
             const hue3 = (high * 360 + 240) % 360;
 
-            // Draw multiple organic layers
             for (let layer = 0; layer < layers; layer++) {
                 const layerProgress = layer / layers;
-                const baseRadius = 80 + layerProgress * 100;
+                const baseRadius = 60 + layerProgress * 120;
                 const points = 64 + Math.floor(layer * 16);
                 
                 ctx.beginPath();
                 
                 for (let i = 0; i <= points; i++) {
                     const angle = (i / points) * Math.PI * 2;
-                    const freqIndex = Math.floor((i / points) * rawFreqs.length);
-                    const freqValue = rawFreqs[freqIndex] / 255;
+                    const freqIndex = Math.floor((i / points) * expandedFreqs.length);
+                    const freqValue = expandedFreqs[freqIndex] / 255;
                     
-                    // Create organic variation
                     const noiseOffset = Math.sin(angle * (3 + layer)) * (20 + rhythm * 30);
-                    const freqOffset = freqValue * 40 * (1 - layerProgress * 0.5);
+                    const freqOffset = freqValue * 50 * (1 - layerProgress * 0.5);
                     const radius = baseRadius + noiseOffset + freqOffset;
                     
-                    const x = cx + Math.cos(angle) * radius;
-                    const y = cy + Math.sin(angle) * radius;
+                    const x = centerX + Math.cos(angle) * radius;
+                    const y = centerY + Math.sin(angle) * radius;
                     
                     if (i === 0) {
                         ctx.moveTo(x, y);
                     } else {
-                        // Smooth curves
                         const prevAngle = ((i - 1) / points) * Math.PI * 2;
-                        const prevFreqIndex = Math.floor(((i - 1) / points) * rawFreqs.length);
-                        const prevFreqValue = rawFreqs[prevFreqIndex] / 255;
+                        const prevFreqIndex = Math.floor(((i - 1) / points) * expandedFreqs.length);
+                        const prevFreqValue = expandedFreqs[prevFreqIndex] / 255;
                         const prevNoiseOffset = Math.sin(prevAngle * (3 + layer)) * (20 + rhythm * 30);
-                        const prevFreqOffset = prevFreqValue * 40 * (1 - layerProgress * 0.5);
+                        const prevFreqOffset = prevFreqValue * 50 * (1 - layerProgress * 0.5);
                         const prevRadius = baseRadius + prevNoiseOffset + prevFreqOffset;
                         
                         const cpRadius = (radius + prevRadius) / 2;
                         const cpAngle = (angle + prevAngle) / 2;
-                        const cpX = cx + Math.cos(cpAngle) * cpRadius * 1.02;
-                        const cpY = cy + Math.sin(cpAngle) * cpRadius * 1.02;
+                        const cpX = centerX + Math.cos(cpAngle) * cpRadius * 1.02;
+                        const cpY = centerY + Math.sin(cpAngle) * cpRadius * 1.02;
                         
                         ctx.quadraticCurveTo(cpX, cpY, x, y);
                     }
@@ -742,7 +842,6 @@
                 
                 ctx.closePath();
                 
-                // Layer-specific styling
                 const hue = layer % 3 === 0 ? hue1 : (layer % 3 === 1 ? hue2 : hue3);
                 const alpha = 0.15 + (1 - layerProgress) * 0.25;
                 
@@ -754,197 +853,123 @@
                 ctx.stroke();
             }
 
-            // Central glow
-            const gradient = ctx.createRadialGradient(cx, cy, 0, cx, cy, 80);
+            const gradient = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, 80);
             gradient.addColorStop(0, `hsla(${hue1}, 100%, 70%, 0.3)`);
             gradient.addColorStop(0.5, `hsla(${hue2}, 80%, 50%, 0.1)`);
             gradient.addColorStop(1, 'transparent');
             
             ctx.fillStyle = gradient;
             ctx.beginPath();
-            ctx.arc(cx, cy, 80, 0, Math.PI * 2);
+            ctx.arc(centerX, centerY, 80, 0, Math.PI * 2);
             ctx.fill();
         }
 
-        // Encode audio into image metadata (steganography-lite)
-        let currentEncodedData = null;
-
-        async function encodeAudioIntoImage(ctx, audioBlob, features) {
-            // Convert audio to base64
-            const reader = new FileReader();
-            reader.onload = () => {
-                const audioBase64 = reader.result.split(',')[1];
-                
-                // Store encoded data for download
-                currentEncodedData = {
-                    audio: audioBase64,
-                    features: features,
-                    timestamp: Date.now()
-                };
-            };
-            reader.readAsDataURL(audioBlob);
-        }
-
-        // Download with encoded data
-        downloadBtn.addEventListener('click', () => {
-            if (!currentEncodedData) return;
-
-            // Create a new canvas with the shape
-            const exportCanvas = document.createElement('canvas');
-            exportCanvas.width = shapeCanvas.width;
-            exportCanvas.height = shapeCanvas.height;
-            const exportCtx = exportCanvas.getContext('2d');
+        shareBtn.addEventListener('click', () => {
+            if (!currentRecordingData) return;
             
-            // Copy shape
-            exportCtx.drawImage(shapeCanvas, 0, 0);
+            const jsonStr = JSON.stringify(currentRecordingData);
+            const compressed = btoa(jsonStr);
+            const fullUrl = `${BASE_URL}?d=${encodeURIComponent(compressed)}`;
             
-            // Encode data in image using LSB steganography
-            const imageData = exportCtx.getImageData(0, 0, exportCanvas.width, exportCanvas.height);
-            const encodedJson = JSON.stringify(currentEncodedData);
-            const encodedBytes = new TextEncoder().encode(encodedJson);
-            
-            // Store length first (4 bytes)
-            const length = encodedBytes.length;
-            for (let i = 0; i < 32; i++) {
-                const bit = (length >> (31 - i)) & 1;
-                imageData.data[i * 4] = (imageData.data[i * 4] & 0xFE) | bit;
-            }
-            
-            // Store data
-            for (let i = 0; i < encodedBytes.length; i++) {
-                for (let b = 0; b < 8; b++) {
-                    const pixelIndex = (32 + i * 8 + b) * 4;
-                    if (pixelIndex < imageData.data.length) {
-                        const bit = (encodedBytes[i] >> (7 - b)) & 1;
-                        imageData.data[pixelIndex] = (imageData.data[pixelIndex] & 0xFE) | bit;
-                    }
-                }
-            }
-            
-            exportCtx.putImageData(imageData, 0, 0);
-            
-            // Download
-            const link = document.createElement('a');
-            link.download = `voiceshape-${Date.now()}.png`;
-            link.href = exportCanvas.toDataURL('image/png');
-            link.click();
+            shareUrl.textContent = fullUrl;
+            shareModal.classList.add('visible');
         });
 
-        // Share functionality
-        shareBtn.addEventListener('click', () => {
-            // In production, this would upload to server and generate unique URL
-            const mockUrl = `https://voiceshape.io/decode/${Date.now().toString(36)}`;
-            navigator.clipboard.writeText(mockUrl).then(() => {
-                shareBtn.textContent = 'Link Copied!';
+        copyLinkBtn.addEventListener('click', () => {
+            const url = shareUrl.textContent;
+            navigator.clipboard.writeText(url).then(() => {
+                copyLinkBtn.textContent = 'Copied!';
                 setTimeout(() => {
-                    shareBtn.textContent = 'Copy Share Link';
+                    copyLinkBtn.textContent = 'Copy Link';
                 }, 2000);
             });
         });
 
-        // New recording
+        closeModalBtn.addEventListener('click', () => {
+            shareModal.classList.remove('visible');
+        });
+
+        shareModal.addEventListener('click', (e) => {
+            if (e.target === shareModal) {
+                shareModal.classList.remove('visible');
+            }
+        });
+
+        downloadBtn.addEventListener('click', () => {
+            const link = document.createElement('a');
+            link.download = `voiceshape-${Date.now()}.png`;
+            link.href = shapeCanvas.toDataURL('image/png');
+            link.click();
+        });
+
         newRecordBtn.addEventListener('click', () => {
             shapeDisplay.classList.remove('visible');
+            recordArea.style.display = 'block';
             recordStatus.textContent = 'Tap to record your message';
             timer.textContent = '';
-            currentEncodedData = null;
+            currentRecordingData = null;
         });
 
-        // Decode functionality
-        uploadZone.addEventListener('click', () => fileInput.click());
-        
-        uploadZone.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            uploadZone.classList.add('dragover');
-        });
-
-        uploadZone.addEventListener('dragleave', () => {
-            uploadZone.classList.remove('dragover');
-        });
-
-        uploadZone.addEventListener('drop', (e) => {
-            e.preventDefault();
-            uploadZone.classList.remove('dragover');
-            const file = e.dataTransfer.files[0];
-            if (file) decodeImage(file);
-        });
-
-        fileInput.addEventListener('change', (e) => {
-            const file = e.target.files[0];
-            if (file) decodeImage(file);
-        });
-
-        function decodeImage(file) {
-            const img = new Image();
-            img.onload = () => {
-                const canvas = document.createElement('canvas');
-                canvas.width = img.width;
-                canvas.height = img.height;
-                const ctx = canvas.getContext('2d');
-                ctx.drawImage(img, 0, 0);
-                
-                const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-                
-                // Extract length
-                let length = 0;
-                for (let i = 0; i < 32; i++) {
-                    const bit = imageData.data[i * 4] & 1;
-                    length = (length << 1) | bit;
-                }
-                
-                // Sanity check
-                if (length <= 0 || length > 1000000) {
-                    decodedMessage.textContent = 'Unable to decode this image. It may not be a valid VoiceShape.';
-                    decodedResult.classList.add('visible');
-                    return;
-                }
-                
-                // Extract data
-                const bytes = new Uint8Array(length);
-                for (let i = 0; i < length; i++) {
-                    let byte = 0;
-                    for (let b = 0; b < 8; b++) {
-                        const pixelIndex = (32 + i * 8 + b) * 4;
-                        if (pixelIndex < imageData.data.length) {
-                            const bit = imageData.data[pixelIndex] & 1;
-                            byte = (byte << 1) | bit;
-                        }
-                    }
-                    bytes[i] = byte;
-                }
-                
-                try {
-                    const jsonStr = new TextDecoder().decode(bytes);
-                    const data = JSON.parse(jsonStr);
-                    
-                    // Display result
-                    const date = new Date(data.timestamp);
-                    decodedMessage.innerHTML = `
-                        <strong>Voice message from ${date.toLocaleDateString()}</strong><br><br>
-                        Bass energy: ${Math.round(data.features.bass * 100)}%<br>
-                        Mid range: ${Math.round(data.features.mid * 100)}%<br>
-                        High frequencies: ${Math.round(data.features.high * 100)}%<br>
-                        Voice rhythm: ${Math.round(data.features.rhythm * 100)}%
-                    `;
-                    
-                    // Recreate audio
-                    if (data.audio) {
-                        const audioSrc = `data:audio/webm;base64,${data.audio}`;
-                        audioPlayback.innerHTML = `
-                            <audio controls src="${audioSrc}"></audio>
-                        `;
-                    }
-                    
-                    decodedResult.classList.add('visible');
-                    
-                } catch (err) {
-                    decodedMessage.textContent = 'Unable to decode this image. It may not be a valid VoiceShape.';
-                    decodedResult.classList.add('visible');
-                }
-            };
+        function showDecodeView(encodedData) {
+            modeTabs.style.display = 'none';
+            infoSection.style.display = 'none';
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.getElementById('decodeSection').classList.add('active');
             
-            img.src = URL.createObjectURL(file);
+            try {
+                const jsonStr = atob(decodeURIComponent(encodedData));
+                const data = JSON.parse(jsonStr);
+                
+                const decodeCanvas = document.getElementById('decodeShapeCanvas');
+                generateShape(data.f, decodeCanvas);
+                
+                const audioData = data.a;
+                const audioSrc = `data:audio/webm;base64,${audioData}`;
+                const audio = new Audio(audioSrc);
+                
+                const playBtn = document.getElementById('playBtn');
+                let isPlaying = false;
+                
+                playBtn.addEventListener('click', () => {
+                    if (!isPlaying) {
+                        audio.play();
+                        isPlaying = true;
+                        playBtn.style.borderColor = '#ff006e';
+                        playBtn.querySelector('svg').style.fill = '#ff006e';
+                    } else {
+                        audio.pause();
+                        audio.currentTime = 0;
+                        isPlaying = false;
+                        playBtn.style.borderColor = '#00d4ff';
+                        playBtn.querySelector('svg').style.fill = '#00d4ff';
+                    }
+                });
+                
+                audio.addEventListener('ended', () => {
+                    isPlaying = false;
+                    playBtn.style.borderColor = '#00d4ff';
+                    playBtn.querySelector('svg').style.fill = '#00d4ff';
+                });
+                
+                const date = new Date(data.t);
+                document.getElementById('voiceInfo').textContent = `Sent ${date.toLocaleDateString()} at ${date.toLocaleTimeString()}`;
+                
+                document.getElementById('decodeLoading').style.display = 'none';
+                document.getElementById('decodeMessage').style.display = 'block';
+                
+            } catch (err) {
+                console.error('Decode error:', err);
+                document.getElementById('decodeLoading').innerHTML = `
+                    <p style="color: #ff006e;">Unable to decode this message.</p>
+                    <p style="color: #666; margin-top: 10px;">The link may be corrupted or incomplete.</p>
+                    <button class="btn btn-primary" style="margin-top: 20px;" onclick="window.location.href='${BASE_URL}'">Create Your Own</button>
+                `;
+            }
         }
+
+        document.getElementById('createOwnBtn')?.addEventListener('click', () => {
+            window.location.href = BASE_URL;
+        });
     </script>
 </body>
 </html>
